@@ -6,6 +6,7 @@ import LearningStatistics from "./pages/LearningStatistics";
 import Success from "./components/DetailWord/Success";
 import Character from "./pages/Character";
 import DetailWord from "./pages/DetailWord";
+import CharacterDetails from "./pages/CharacterDetails";
 const Router = () => {
   return (
     <Routes>
@@ -13,6 +14,7 @@ const Router = () => {
       <Route path="/wordList" element={<WordList />} />
       <Route path="/statistics" element={<LearningStatistics />} />{" "}
       <Route path="/character" element={<Character />} />
+      <Route path="/detailcharacter" element={<CharacterDetails />} />
       <Route path="/detailword" element={<DetailWord />} />
       {/* <Route path="/success" element={<Success />} /> */}
     </Routes>

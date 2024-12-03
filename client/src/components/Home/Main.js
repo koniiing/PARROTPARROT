@@ -41,7 +41,7 @@ const Main = () => {
           window.webkitAudioContext)();
         const source = audioContext.createBufferSource();
         const gainNode = audioContext.createGain();
-        const playbackRate = 1.5; // Speed up playback
+        const playbackRate = 1.3; // Speed up playback
 
         // Decode audio data
         const arrayBuffer = await audioBlob.arrayBuffer();
@@ -70,7 +70,7 @@ const Main = () => {
       setTimeout(() => {
         mediaRecorder.stop();
         setIsRecording(false);
-      }, 7000);
+      }, 4000);
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }

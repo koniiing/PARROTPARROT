@@ -21,16 +21,16 @@ const LearningStatistics = () => {
 
       <StatsSummary>
         <Stat>
-          <strong>N일째</strong> <br />
+          <strong>3일째</strong> <br />
           연속 학습 중
         </Stat>
         <Stat>
-          <strong>N개 단어 </strong>
+          <strong>4개 단어 </strong>
           <br />
           학습 완료
         </Stat>
         <Stat>
-          <strong>총 N일</strong> <br />
+          <strong>총 3일</strong> <br />
           누적 학습
         </Stat>{" "}
         <ParrotImage src={character} alt="Parrot" />

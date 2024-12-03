@@ -2,109 +2,127 @@ import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import Recorder from "recorder-js"; // Ensure you have imported Recorder.js
 import img from "../assets/images/ricebowl.svg";
+import img2 from "../assets/images/video.mp4";
+import img3 from "../assets/images/bob_real.mp4";
+import soundplay from "../assets/images/soundplay.svg";
+import videoplay from "../assets/images/videoplay.svg";
+import test1 from "../assets/images/test1.svg";
+import test2 from "../assets/images/test2.svg";
+import test3 from "../assets/images/test3.svg";
+import test4 from "../assets/images/test4.svg";
+import test5 from "../assets/images/test5.svg";
+import congrat from "../assets/images/congrat.svg";
+
 import arrowR from "../assets/images/rightarrow.png";
 import arrowL from "../assets/images/leftarrow.svg";
 import Table from "../components/DetailWord/Table";
+import sound from "../assets/sound.mp3";
 import { useLocation, useNavigate } from "react-router-dom";
-import SpeechProcessor from "../components/DetailWord/SpeechProcessor";
+import Pronunciation from "../components/DetailWord/Pronunciation";
 const DetailWord = () => {
-  const [progress, setProgress] = useState(0);
-  const [recording, setRecording] = useState(false);
-  const [message, setMessage] = useState("");
-  const [pronScore, setPronScore] = useState(null);
-  const [audioUrl, setAudioUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const audioContext = useRef(null);
-  const gumStream = useRef(null);
-  const recorder = useRef(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentTestImage, setCurrentTestImage] = useState(0);
   const navigate = useNavigate();
-  const [text, setText] = useState("밥"); // 기본 텍스트를 "밥"으로 설정
-  const handleRecord = async () => {
-    if (!recording) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        audioContext.current = new (window.AudioContext ||
-          window.webkitAudioContext)();
-        gumStream.current = stream;
+  const audioRef = useRef(new Audio(sound));
+  const videoRef = useRef(null);
+  const [showFullscreenImage, setShowFullscreenImage] = useState(false);
+  const images = [
+    { type: "image", src: img, text: "그림 이미지" },
+    { type: "video", src: img3, text: "영상" },
+    { type: "video", src: img2, text: "3d" },
+  ];
 
-        // Correctly initialize recorder-js
-        recorder.current = new Recorder(audioContext.current);
-        recorder.current.init(stream);
+  const testImages = [test1, test2, test3, test4, test5];
 
-        // Start recording
-        await recorder.current.start();
-        setRecording(true);
-        setMessage("녹음 중...");
-      } catch (err) {
-        console.error("Microphone access denied:", err);
-        setMessage("마이크에 접근할 수 없습니다.");
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => {
+      if (prevIndex === 2) {
+        return 0;
+      } else {
+        return prevIndex + 1;
       }
-    } else {
-      // Stop recording
-      const { blob } = await recorder.current.stop();
-      gumStream.current.getAudioTracks()[0].stop();
+    });
+  };
 
-      setRecording(false);
-      setMessage("녹음 종료, 점수 계산 중...");
-      await calculatePronScore(blob);
+  const handlePreviousImage = () => {
+    setCurrentImageIndex((prevIndex) => {
+      if (prevIndex === 0) {
+        return 2;
+      } else {
+        return prevIndex - 1;
+      }
+    });
+  };
+  const handleNextTestImage = () => {
+    if (currentTestImage < testImages.length - 1) {
+      setCurrentTestImage((prevIndex) => prevIndex + 1);
+    }
+    if (currentTestImage === testImages.length - 1) {
+      setTimeout(() => {
+        setShowFullscreenImage(true);
+      }, 400); // 800ms delay before showing fullscreen image
     }
   };
 
-  const calculatePronScore = async (blob) => {
-    try {
-      setLoading(true);
-      const formData = new FormData();
-      formData.append("audio_data", blob);
-      formData.append("reftext", "밥"); // Replace with dynamic reference text if needed
-
-      const response = await fetch("/gettts", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      setPronScore(data.PronScore);
-      setProgress(data.PronScore); // Update the progress bar with the score
-      setMessage("발음 점수가 업데이트되었습니다!");
-    } catch (err) {
-      console.error("Error calculating pronunciation score:", err);
-      setMessage("점수 계산에 실패했습니다.");
-    } finally {
-      setLoading(false);
+  const handlePlay = () => {
+    if (currentImageIndex === 0) {
+      console.log("Play sound");
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    } else {
+      console.log("Play video");
+      // Video play logic here
     }
   };
 
   return (
     <Container>
-      <Header>
-        <BackButton onClick={() => navigate("/wordlist")}>←</BackButton>
-        <Title>밥</Title>
-      </Header>
-      <Content>
-        <ImageWrapper>
-          <Arrow src={arrowL} />
-          <FoodImage src={img} alt="Rice Bowl" />
-          <Arrow src={arrowR} />
-        </ImageWrapper>
-        <ProgressContainer>
-          <ProgressBar progress={progress} />
-          <ProgressText>발음 점수: {progress}%</ProgressText>
-        </ProgressContainer>
-        <RecordingArea>
-          {recording ? (
-            <Waveform>🎤</Waveform>
-          ) : (
-            <PromptText>소리를 듣고 따라해볼까요?</PromptText>
-          )}
-          <RetryMessage>{message}</RetryMessage>
-        </RecordingArea>
-        <Button onClick={handleRecord}>
-          {recording ? <StopIcon>■</StopIcon> : <RecordIcon>●</RecordIcon>}
-        </Button>
-        <SpeechProcessor />
-      </Content>
+      {!showFullscreenImage ? (
+        <>
+          <Header>
+            <BackButton onClick={() => navigate("/wordlist")}>←</BackButton>
+            <Title>밥</Title>
+          </Header>
+          <Content>
+            <ImageWrapper>
+              <Arrow src={arrowL} onClick={handlePreviousImage} />
+              {images[currentImageIndex].type === "image" ? (
+                <Image src={images[currentImageIndex].src} />
+              ) : (
+                <Video controls>
+                  <source
+                    src={images[currentImageIndex].src}
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </Video>
+              )}
+              <Arrow src={arrowR} onClick={handleNextImage} />
+              <PlayButton
+                src={currentImageIndex === 0 ? soundplay : videoplay}
+                alt={currentImageIndex === 0 ? "Sound Play" : "Video Play"}
+                onClick={handlePlay}
+              />
+            </ImageWrapper>
+            <TestWrapper>
+              <TestSection
+                src={testImages[currentTestImage]}
+                onClick={handleNextTestImage}
+              />
+            </TestWrapper>
+          </Content>
+        </>
+      ) : (
+        <FullscreenImage
+          src={congrat}
+          alt="Fullscreen Image"
+          onClick={() => navigate("/wordlist")}
+        />
+      )}
     </Container>
   );
 };
@@ -119,6 +137,11 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
 `;
+const FullscreenImage = styled.img`
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+`;
 
 const Header = styled.header`
   display: flex;
@@ -130,6 +153,14 @@ const Header = styled.header`
   color: #fff;
   font-size: 18px;
 `;
+const TestWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px;
+`;
+
+const TestSection = styled.img``;
 
 const BackButton = styled.button`
   background: none;
@@ -170,6 +201,7 @@ const ImageWrapper = styled.div`
   height: 341px;
   border-radius: 10px;
   background: #fff;
+  position: relative;
 `;
 
 const Arrow = styled.img`
@@ -178,11 +210,24 @@ const Arrow = styled.img`
   cursor: pointer;
 `;
 
-const FoodImage = styled.img`
-  width: 150px;
-  height: 150px;
+const Image = styled.img`
+  width: 180px;
+  height: 180px;
   border-radius: 8px;
   margin: 20px;
+`;
+const Video = styled.video`
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  margin: 20px;
+`;
+const PlayButton = styled.img`
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
 `;
 
 const ProgressContainer = styled.div`

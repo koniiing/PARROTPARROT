@@ -6,16 +6,16 @@ const WordList = () => {
   const navigate = useNavigate();
 
   const words = [
-    { text: "야", date: "2024.10.27", progress: 80, rating: 3 },
-    { text: "바", date: "2024.10.23", progress: 75, rating: 1 },
+    { text: "밥", date: "2024.10.27", progress: 80, rating: 3 },
+    { text: "야", date: "2024.10.23", progress: 75, rating: 1 },
     { text: "나", date: "2024.10.23", progress: 50, rating: 2 },
     { text: "네", date: "2024.10.22", progress: 30, rating: 3 },
     { text: "까까", date: "2024.10.22", progress: 50, rating: 1 },
     { text: "가", date: "2024.10.22", progress: 10, rating: 1 },
     { text: "아니", date: "2024.10.22", progress: 30, rating: 2 },
     { text: "좋아", date: "2024.10.22", progress: 10, rating: 1 },
-    { text: "조", date: "2024.10.22", progress: 70, rating: 2 },
-    { text: "밥", date: "2024.10.22", progress: 90, rating: 1 },
+    { text: "아파", date: "2024.10.22", progress: 70, rating: 2 },
+    { text: "바", date: "2024.10.22", progress: 90, rating: 1 },
   ];
 
   return (
@@ -30,7 +30,11 @@ const WordList = () => {
       </SearchWrapper>
       <WordGrid>
         {words.map((word, index) => (
-          <WordCard key={index} onClick={() => navigate("/detailword")}>
+          <WordCard
+            key={index}
+            onClick={() => navigate("/detailword")}
+            //          onClick={() => window.location.href = "http://127.0.0.1:5000/"}
+          >
             <WordText>{word.text}</WordText>{" "}
             <Rating>{"★".repeat(word.rating).padEnd(3, "☆")}</Rating>
             <ProgressBar>
