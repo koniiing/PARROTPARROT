@@ -123,6 +123,7 @@ const DetailWord = () => {
           onClick={() => navigate("/wordlist")}
         />
       )}
+      <Pronunciation />
     </Container>
   );
 };
