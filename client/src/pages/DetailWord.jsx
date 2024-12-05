@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import Recorder from "recorder-js"; // Ensure you have imported Recorder.js
 import img from "../assets/images/ricebowl.svg";
-import img2 from "../assets/images/video.mp4";
+import img2 from "../assets/images/final_bob.mp4";
 import img3 from "../assets/images/bob_real.mp4";
 import soundplay from "../assets/images/soundplay.svg";
 import videoplay from "../assets/images/videoplay.svg";
@@ -123,7 +123,6 @@ const DetailWord = () => {
           onClick={() => navigate("/wordlist")}
         />
       )}
-      <Pronunciation />
     </Container>
   );
 };
