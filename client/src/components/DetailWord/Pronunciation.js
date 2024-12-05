@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import styled, { keyframes } from "styled-components";
+import axios from "axios";
 
 const Pronunciation = () => {
   const [recording, setRecording] = useState(false);
@@ -7,7 +8,6 @@ const Pronunciation = () => {
   const [ttsAudio, setTtsAudio] = useState(null);
   const [metrics, setMetrics] = useState(null);
   const [refText, setRefText] = useState("");
-  const [offsets, setOffsets] = useState([]);
   const [omittedWords, setOmittedWords] = useState("");
   const [insertedWords, setInsertedWords] = useState("");
   const [permission, setPermission] = useState(false);
@@ -30,7 +30,6 @@ const Pronunciation = () => {
       recorder.onstop = () => {
         const audioBlob = new Blob(chunks, { type: "audio/wav" });
         setAudioBlob(audioBlob);
-        stopRecording();
       };
 
       recorder.start();
@@ -49,28 +48,8 @@ const Pronunciation = () => {
     }
   };
 
-  const fetchTTS = async (text) => {
-    try {
-      const response = await fetch("http://127.0.0.1:5000/gettts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reftext: text }),
-      });
-
-      if (!response.ok) {
-        throw new Error("TTS 요청 실패");
-      }
-
-      const blob = await response.blob();
-      const offsets = response.headers.get("offsets").split(",").map(Number);
-      console.log("TTS Audio Blob:", blob);
-      console.log("Offsets:", offsets);
-    } catch (error) {
-      console.error("TTS 요청 오류:", error);
-    }
-  };
-
-  const analyzeRecording = async (audioBlob, refText) => {
+  const analyzeRecording = async () => {
+    if (!audioBlob || !refText) return;
     const formData = new FormData();
     formData.append("audio_data", audioBlob); // Flask로 파일 데이터 전송
     formData.append("reftext", refText); // 추가 텍스트 데이터
@@ -87,6 +66,10 @@ const Pronunciation = () => {
 
       const data = await response.json();
       console.log("분석 결과:", data);
+      setMetrics(data); // 분석 결과 데이터를 상태로 설정
+      if (data.Words) {
+        processMetrics(data.Words);
+      }
     } catch (error) {
       console.error("녹음 분석 요청 오류:", error);
     }
@@ -117,11 +100,6 @@ const Pronunciation = () => {
   return (
     <AppContainer>
       <TtsContainer>
-        <ButtonContainer>
-          <HearingButton onClick={() => fetchTTS(refText)}>
-            <span className="fas fa-headphones"></span>발음 배우기
-          </HearingButton>
-        </ButtonContainer>
         {ttsAudio && (
           <TtsList>
             <audio controls src={ttsAudio}></audio>
